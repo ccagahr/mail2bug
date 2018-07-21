@@ -38,6 +38,15 @@ namespace Mail2Bug.Email
         {
             var replyTemplate = new AckEmailTemplate(_config.EmailSettings.GetReplyTemplate());
             var replyBody = replyTemplate.Apply(workItemFields, _config);
+            originalMessage.BeforeMessageSend += (origmessage, message) =>
+            {
+                // only add the work item id, if it not allready there
+                // TODO: remove hard coded strings hier an place it in the configuration
+                if (!origmessage.Subject.Contains("bug #"))
+                {
+                    message.Subject = "bug #" + workItemFields.ID + " created RE: " + origmessage.Subject;
+                }
+            };
             originalMessage.Reply(replyBody, _config.EmailSettings.AckEmailsRecipientsAll);
         }
         
