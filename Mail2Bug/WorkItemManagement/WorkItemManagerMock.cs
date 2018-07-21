@@ -43,7 +43,25 @@ namespace Mail2Bug.WorkItemManagement
 
         void IWorkItemManager.AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList)
         {
-            throw new NotImplementedException();
+            foreach (var filename in fileList.Where(filename => !File.Exists(filename.Item1)))
+            {
+                Logger.ErrorFormat("Couldn't find attachment file {0}", filename.Item1);
+            }
+
+            if (ThrowOnAttachFiles != null)
+            {
+                throw ThrowOnAttachFiles;
+            }
+
+            if (!Attachments.ContainsKey(workItemId))
+            {
+                Attachments[workItemId] = new List<string>();
+            }
+
+            foreach (var filename in fileList.Where(filename => File.Exists(filename.Item1)))
+            {
+                Attachments[workItemId].Add(filename.Item1);
+            }
         }
 
         public void CacheWorkItem(int workItemId)
