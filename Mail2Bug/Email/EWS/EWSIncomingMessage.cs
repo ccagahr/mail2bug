@@ -16,6 +16,9 @@ namespace Mail2Bug.Email.EWS
         private readonly byte[] _conversationId;
         private readonly bool _useConversationGuidOnly;
 
+        public delegate void OnBeforeMessageSendHandler(EmailMessage origmessage, ResponseMessage message);
+        public event OnBeforeMessageSendHandler BeforeMessageSend;
+        
         public EWSIncomingMessage(EmailMessage message, bool useConversationGuidOnly = false, bool convertInlineAttachments = false)
         {
             _message = message;
@@ -157,7 +160,16 @@ namespace Mail2Bug.Email.EWS
         {
             var reply = _message.CreateReply(replyAll);
             reply.BodyPrefix = new MessageBody(BodyType.HTML, replyHtml);
+            OnBeforeMessageSend(_message, reply);
             reply.Send();
+        }
+
+        protected void OnBeforeMessageSend(EmailMessage origmessage, ResponseMessage message)
+        {
+            if (BeforeMessageSend != null)
+            {
+                BeforeMessageSend(origmessage, message);
+            }
         }
 
         private static string GetPlainTextBody(Item message)
