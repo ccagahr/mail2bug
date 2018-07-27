@@ -34,7 +34,7 @@ namespace Mail2Bug.Email.EWS
 
             return items
                     .Where(item => item is EmailMessage) // Return only email message items - ignore any other items
-                    .Select(item => new EWSIncomingMessage((EmailMessage) item, _useConversationGuidOnly)); // And wrap them with EWSIncomingMessage
+                    .Select(item => new EWSIncomingMessage((EmailMessage) item, _useConversationGuidOnly, true /* config is not available here maybe, so hardcoded to true temporary*/)); // And wrap them with EWSIncomingMessage
         }
     }
 }

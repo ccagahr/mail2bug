@@ -287,7 +287,7 @@ namespace Mail2Bug.WorkItemManagement
                     WorkItemAttachmentIndex = workItem.Attachments.Add(new Attachment(f.Item1)),
                     IsInline = f.Item2.IsInline,
                     ContentId = f.Item2.ContentId
-                });
+                }).ToList(); // copy it to a list, to prevent the LINQ Expression is execution on every access (dublicate attachments)                
 
                 ValidateAndSaveWorkItem(workItem); // Save before proceeding to generate the URIs for the attachments
 
@@ -295,7 +295,7 @@ namespace Mail2Bug.WorkItemManagement
 
                 string html = workItem.Fields[fieldNameToUpdate].Value?.ToString();
 
-                const string pattern = @"(\<img.* src=\"")(cid:)(.*)(\"".*\>)";
+                const string pattern = @"(<img.*? src=\"")(cid:)(.*?)(\"".*?>)";
 
                 // Images that are too large to have been base64 encoded are handled here. The item body is scanned for content ids
                 // and matched up to their attachments, and the image src attribute is updated to point to the attachment.
@@ -310,7 +310,7 @@ namespace Mail2Bug.WorkItemManagement
                     if (tracker != null)
                     {
                         Logger.DebugFormat("Converting attached image to inline reference");
-                        var workItemAttachment = workItem.Attachments[tracker.WorkItemAttachmentIndex];
+                        var workItemAttachment = workItem.Attachments[tracker.WorkItemAttachmentIndex];                        
                         workItem.Attachments.Remove(workItemAttachment); // No need to keep the image as an attachment once it's been inlined.
                         return $"{match.Groups[1]}{workItemAttachment.Uri.ToString()}{match.Groups[4]}";
                     }

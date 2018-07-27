@@ -96,7 +96,7 @@ namespace Mail2Bug.Email.EWS
 
         private void Base64EncodeImages()
         {
-            const string pattern = @"(\<img.* src=\"")(cid:)(.*)(\"".*\>)";
+            const string pattern = @"(<img.* src=\"")(cid:)(.*?)(\"".*?>)";
 
             var inlineAttachments = _attachments.OfType<EWSIncomingFileAttachment>().Where(x => x.IsInline);
 
