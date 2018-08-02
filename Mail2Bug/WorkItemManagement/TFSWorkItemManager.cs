@@ -281,10 +281,19 @@ namespace Mail2Bug.WorkItemManagement
             }
         }
 
-        public void AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList, string fieldNameToUpdate)
+        public void AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList)
         {
             if (workItemId <= 0) return;
-                        
+
+            string fieldNameToUpdate;
+            if (outstandingWorkItemUpdates != null && outstandingWorkItemUpdates.ContainsKey(workItemId))
+            {
+                fieldNameToUpdate = "History";
+            }
+            else
+            {
+                fieldNameToUpdate = _config.WorkItemSettings.EmailBodyFieldName;
+            }
 
             if (_config.EmailSettings.ConvertInlineAttachments && String.IsNullOrEmpty(fieldNameToUpdate))
             {
@@ -388,7 +397,7 @@ namespace Mail2Bug.WorkItemManagement
         /// <param name="workItemId">The ID of the work item to modify </param>
         /// <param name="comment">Comment to add to description</param>
         /// <param name="values">List of fields to change</param>
-        public void AddOutstandingModifyWorkItem(int workItemId, string htmlComment, Dictionary<string, string> values)
+        private void AddOutstandingModifyWorkItem(int workItemId, string htmlComment, Dictionary<string, string> values)
         {
             if (workItemId <= 0) return;
 
@@ -399,16 +408,24 @@ namespace Mail2Bug.WorkItemManagement
         
 
         /// <param name="workItemId">The ID of the work item to modify </param>
-        /// <param name="comment">Comment to add to description</param>
+        /// <param name="message">Messsage to get the comment to add to description/history</param>
         /// <param name="values">List of fields to change</param>
-        public void ModifyWorkItem(int workItemId, string comment, Dictionary<string, string> values)
+        public void ModifyWorkItem(int workItemId, IIncomingEmailMessage message, Dictionary<string, string> values)
         {
             if (workItemId <= 0) return;
+
+            if (_config.WorkItemSettings.UseWholeEmailBodyInHistory)
+            {
+                // just remember changes and apply them later in the AttachAndInlineFiles method
+                this.AddOutstandingModifyWorkItem(workItemId, message.HtmlBody, values);
+                return;
+            }
 
             var workItem = _tfsStore.GetWorkItem(workItemId);
 
             workItem.Open();
-
+                        
+            string comment = message.GetLastMessageText();
             workItem.History = comment.Replace("\n", "<br>");
             foreach (var key in values.Keys)
             {

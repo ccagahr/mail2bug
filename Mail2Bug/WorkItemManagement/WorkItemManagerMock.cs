@@ -41,7 +41,7 @@ namespace Mail2Bug.WorkItemManagement
             Attachments[workItemId].AddRange(fileList);
         }
 
-        void IWorkItemManager.AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList, string fieldNameToUpdate)
+        void IWorkItemManager.AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList)
         {
             foreach (var filename in fileList.Where(filename => !File.Exists(filename.Item1)))
             {
@@ -104,7 +104,7 @@ namespace Mail2Bug.WorkItemManagement
             return id;
         }
 
-        public void ModifyWorkItem(int workItemId, string comment, Dictionary<string, string> values)
+        public void ModifyWorkItem(int workItemId, IIncomingEmailMessage message, Dictionary<string, string> values)
         {
             if (ThrowOnModifyBug != null) throw ThrowOnModifyBug;
 
@@ -124,8 +124,8 @@ namespace Mail2Bug.WorkItemManagement
             {
                 bugEntry[HistoryField] = "";
             }
-
-            bugEntry[HistoryField] += comment;
+            
+            bugEntry[HistoryField] += message.GetLastMessageText();
         }
 
         public IWorkItemFields GetWorkItemFields(int workItemId)

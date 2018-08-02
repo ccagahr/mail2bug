@@ -9,7 +9,7 @@ namespace Mail2Bug.WorkItemManagement
     {
         void AttachFiles(int workItemId, IEnumerable<string> fileList);
 
-        void AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList, string fieldNameToUpdate);
+        void AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList);
 
         SortedList<string, int> WorkItemsCache { get; }
 
@@ -20,9 +20,9 @@ namespace Mail2Bug.WorkItemManagement
         int CreateWorkItem(Dictionary<string, string> values);
 
         /// <param name="workItemId">The ID of the bug to modify </param>
-        /// <param name="comment">Comment to add to description</param>
+        /// <param name="message">Message to read the comment or whole html body to add to description/history</param>
         /// <param name="values">List of fields to change</param>
-        void ModifyWorkItem(int workItemId, string comment, Dictionary<string, string> values);
+        void ModifyWorkItem(int workItemId, IIncomingEmailMessage message, Dictionary<string, string> values);
 
         INameResolver GetNameResolver();
 

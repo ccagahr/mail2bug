@@ -128,7 +128,7 @@ namespace Mail2Bug.MessageProcessingStrategies
             try
             {
                 Logger.DebugFormat("Overrides found. Calling 'ModifyWorkItem'");
-                _workItemManager.ModifyWorkItem(workItemId, "", overrides);
+                _workItemManager.ModifyWorkItem(workItemId, null, overrides);
             }
             catch (Exception ex)
             {
@@ -160,12 +160,7 @@ namespace Mail2Bug.MessageProcessingStrategies
             }
 
             // Construct the text to be appended            
-            // TODO move this to the classes implementing IWorkItemManager
-            var tfsworkitemmanager = _workItemManager as TFSWorkItemManager;
-            if (tfsworkitemmanager != null)
-                tfsworkitemmanager.AddOutstandingModifyWorkItem(workItemId, message.HtmlBody, workItemUpdates);
-            else
-                _workItemManager.ModifyWorkItem(workItemId, message.GetLastMessageText(), workItemUpdates);
+            _workItemManager.ModifyWorkItem(workItemId, message, workItemUpdates);
 
             ProcessAttachments(message, workItemId, false);
 
@@ -178,7 +173,7 @@ namespace Mail2Bug.MessageProcessingStrategies
         private void ProcessAttachments(IIncomingEmailMessage message, int workItemId, bool convertInlineAttachments)
         {
             var fileList = SaveAttachments(message);
-            _workItemManager.AttachAndInlineFiles(workItemId, fileList, convertInlineAttachments == false ? "History" : _config.WorkItemSettings.EmailBodyFieldName);
+            _workItemManager.AttachAndInlineFiles(workItemId, fileList);
             fileList.ToList().ForEach(x => File.Delete(x.Item1));
         }
 
