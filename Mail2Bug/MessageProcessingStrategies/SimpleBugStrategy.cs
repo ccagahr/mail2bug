@@ -159,8 +159,13 @@ namespace Mail2Bug.MessageProcessingStrategies
                 overrides.ToList().ForEach(x => workItemUpdates[x.Key] = x.Value);
             }
 
-            // Construct the text to be appended
-            _workItemManager.ModifyWorkItem(workItemId, message.GetLastMessageText(), workItemUpdates);
+            // Construct the text to be appended            
+            // TODO move this to the classes implementing IWorkItemManager
+            var tfsworkitemmanager = _workItemManager as TFSWorkItemManager;
+            if (tfsworkitemmanager != null)
+                tfsworkitemmanager.AddOutstandingModifyWorkItem(workItemId, message.HtmlBody, workItemUpdates);
+            else
+                _workItemManager.ModifyWorkItem(workItemId, message.GetLastMessageText(), workItemUpdates);
 
             ProcessAttachments(message, workItemId, false);
 
@@ -173,7 +178,7 @@ namespace Mail2Bug.MessageProcessingStrategies
         private void ProcessAttachments(IIncomingEmailMessage message, int workItemId, bool convertInlineAttachments)
         {
             var fileList = SaveAttachments(message);
-            _workItemManager.AttachAndInlineFiles(workItemId, fileList);
+            _workItemManager.AttachAndInlineFiles(workItemId, fileList, convertInlineAttachments == false ? "History" : _config.WorkItemSettings.EmailBodyFieldName);
             fileList.ToList().ForEach(x => File.Delete(x.Item1));
         }
 

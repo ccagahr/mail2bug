@@ -9,7 +9,7 @@ namespace Mail2Bug.WorkItemManagement
     {
         void AttachFiles(int workItemId, IEnumerable<string> fileList);
 
-        void AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList);
+        void AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList, string fieldNameToUpdate);
 
         SortedList<string, int> WorkItemsCache { get; }
 

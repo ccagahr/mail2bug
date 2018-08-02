@@ -41,7 +41,7 @@ namespace Mail2Bug.WorkItemManagement
             Attachments[workItemId].AddRange(fileList);
         }
 
-        void IWorkItemManager.AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList)
+        void IWorkItemManager.AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList, string fieldNameToUpdate)
         {
             foreach (var filename in fileList.Where(filename => !File.Exists(filename.Item1)))
             {

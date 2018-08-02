@@ -21,6 +21,8 @@ namespace Mail2Bug.WorkItemManagement
     {
         public SortedList<string, int> WorkItemsCache { get; private set; }
 
+        protected Dictionary<int, Tuple<string, Dictionary<string, string>>> outstandingWorkItemUpdates;
+
         public TFSWorkItemManager(Config.InstanceConfig config)
         {
             ValidateConfig(config);
@@ -253,6 +255,8 @@ namespace Mail2Bug.WorkItemManagement
                 WorkItem workItem = _tfsStore.GetWorkItem(workItemId);
                 workItem.Open();
 
+                this.AssingUpdatedFields(workItem);
+
                 foreach (var file in fileList)
                     workItem.Attachments.Add(new Attachment(file));
 
@@ -264,11 +268,23 @@ namespace Mail2Bug.WorkItemManagement
             }
         }
 
-        public void AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList)
+        private void AssingUpdatedFields(WorkItem workItem)
+        {
+            if (outstandingWorkItemUpdates != null)
+            {
+                if (outstandingWorkItemUpdates.ContainsKey(workItem.Id))
+                {
+                    var value = outstandingWorkItemUpdates[workItem.Id];
+                    this.ModifyWorkItemWithoutSave(workItem, value.Item1, value.Item2);
+                    outstandingWorkItemUpdates.Remove(workItem.Id);
+                }
+            }
+        }
+
+        public void AttachAndInlineFiles(int workItemId, IEnumerable<Tuple<string, IIncomingEmailAttachment>> fileList, string fieldNameToUpdate)
         {
             if (workItemId <= 0) return;
-
-            string fieldNameToUpdate = _config.WorkItemSettings.EmailBodyFieldName;
+                        
 
             if (_config.EmailSettings.ConvertInlineAttachments && String.IsNullOrEmpty(fieldNameToUpdate))
             {
@@ -292,6 +308,8 @@ namespace Mail2Bug.WorkItemManagement
                 ValidateAndSaveWorkItem(workItem); // Save before proceeding to generate the URIs for the attachments
 
                 workItem.PartialOpen();
+
+                this.AssingUpdatedFields(workItem);
 
                 string html = workItem.Fields[fieldNameToUpdate].Value?.ToString();
 
@@ -366,6 +384,20 @@ namespace Mail2Bug.WorkItemManagement
             return workItem.Id;
         }
 
+
+        /// <param name="workItemId">The ID of the work item to modify </param>
+        /// <param name="comment">Comment to add to description</param>
+        /// <param name="values">List of fields to change</param>
+        public void AddOutstandingModifyWorkItem(int workItemId, string htmlComment, Dictionary<string, string> values)
+        {
+            if (workItemId <= 0) return;
+
+            if (outstandingWorkItemUpdates == null)
+                outstandingWorkItemUpdates = new Dictionary<int, Tuple<string, Dictionary<string, string>>>();
+            outstandingWorkItemUpdates.Add(workItemId, new Tuple<string, Dictionary<string, string>>(htmlComment, values));            
+        }
+        
+
         /// <param name="workItemId">The ID of the work item to modify </param>
         /// <param name="comment">Comment to add to description</param>
         /// <param name="values">List of fields to change</param>
@@ -386,6 +418,18 @@ namespace Mail2Bug.WorkItemManagement
             ValidateAndSaveWorkItem(workItem);
 
             workItem.Save();
+        }
+
+        /// <param name="workItem">The work item to modify </param>
+        /// <param name="comment">Html comment to add to history</param>
+        /// <param name="values">List of fields to change</param>
+        public void ModifyWorkItemWithoutSave(WorkItem workItem, string htmlComment, Dictionary<string, string> values)
+        {                                 
+            workItem.History = htmlComment;
+            foreach (var key in values.Keys)
+            {
+                TryApplyFieldValue(workItem, key, values[key]);
+            }            
         }
 
         public IWorkItemFields GetWorkItemFields(int workItemId)
