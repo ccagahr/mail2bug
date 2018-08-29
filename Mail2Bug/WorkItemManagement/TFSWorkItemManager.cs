@@ -309,10 +309,11 @@ namespace Mail2Bug.WorkItemManagement
 
                 var attachmentTrackers = fileList.Select(f => new
                 {
-                    WorkItemAttachmentIndex = workItem.Attachments.Add(new Attachment(f.Item1)),
+                    Attachment = new Attachment(f.Item1),                    
                     IsInline = f.Item2.IsInline,
-                    ContentId = f.Item2.ContentId
+                    ContentId = f.Item2.ContentId                    
                 }).ToList(); // copy it to a list, to prevent the LINQ Expression is execution on every access (dublicate attachments)                
+                attachmentTrackers.ForEach(a => workItem.Attachments.Add(a.Attachment));
 
                 ValidateAndSaveWorkItem(workItem); // Save before proceeding to generate the URIs for the attachments
 
@@ -333,13 +334,13 @@ namespace Mail2Bug.WorkItemManagement
                 {
                     string contentId = match.Groups[3].ToString();
 
-                    var tracker = attachmentTrackers.FirstOrDefault(a => a.ContentId == contentId);
+                    var tracker = attachmentTrackers.FirstOrDefault(a => a.ContentId == contentId && a.IsInline == true);
                     if (tracker != null)
                     {
+                        
                         Logger.DebugFormat("Converting attached image to inline reference");
-                        var workItemAttachment = workItem.Attachments[tracker.WorkItemAttachmentIndex];                        
-                        workItem.Attachments.Remove(workItemAttachment); // No need to keep the image as an attachment once it's been inlined.
-                        return $"{match.Groups[1]}{workItemAttachment.Uri.ToString()}{match.Groups[4]}";
+                        workItem.Attachments.Remove(tracker.Attachment); // No need to keep the image as an attachment once it's been inlined.                                                                            
+                        return $"{match.Groups[1]}{tracker.Attachment.Uri.ToString()}{match.Groups[4]}";
                     }
                     return match.Groups[0].ToString();
                 });
