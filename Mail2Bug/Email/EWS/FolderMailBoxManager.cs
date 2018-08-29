@@ -16,13 +16,15 @@ namespace Mail2Bug.Email.EWS
         private readonly string _mailFolder;
         private readonly IMessagePostProcessor _postProcessor;
         private readonly bool _useConversationGuidOnly;
+        private readonly bool _convertInlineAttachments;
 
-        public FolderMailboxManager(ExchangeService connection, string incomingFolder, IMessagePostProcessor postProcessor, bool useConversationGuidOnly)
+        public FolderMailboxManager(ExchangeService connection, string incomingFolder, IMessagePostProcessor postProcessor, bool useConversationGuidOnly, bool convertInlineAttachments)
         {
             _service = connection;
             _mailFolder = incomingFolder;
             _postProcessor = postProcessor;
             _useConversationGuidOnly = useConversationGuidOnly;
+            _convertInlineAttachments = convertInlineAttachments;
         }
 
         public IEnumerable<IIncomingEmailMessage> ReadMessages()
@@ -46,7 +48,7 @@ namespace Mail2Bug.Email.EWS
             return items
                 .Where(item => item is EmailMessage)
                 .OrderBy(message => message.DateTimeReceived)
-                .Select(message => new EWSIncomingMessage(message as EmailMessage, this._useConversationGuidOnly))
+                .Select(message => new EWSIncomingMessage(message as EmailMessage, this._useConversationGuidOnly, _convertInlineAttachments))
                 .AsEnumerable();
         }
 

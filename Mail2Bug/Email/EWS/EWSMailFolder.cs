@@ -9,11 +9,13 @@ namespace Mail2Bug.Email.EWS
     {
         private readonly Folder _folder;
         private readonly bool _useConversationGuidOnly;
+        private readonly bool _convertInlineAttachments;
 
-        public EWSMailFolder(Folder folder, bool useConversationGuidOnly)
+        public EWSMailFolder(Folder folder, bool useConversationGuidOnly, bool convertInlineAttachments)
         {
             _folder = folder;
             _useConversationGuidOnly = useConversationGuidOnly;
+            _convertInlineAttachments = convertInlineAttachments;
         }
 
         public int GetTotalCount()
@@ -34,7 +36,7 @@ namespace Mail2Bug.Email.EWS
 
             return items
                     .Where(item => item is EmailMessage) // Return only email message items - ignore any other items
-                    .Select(item => new EWSIncomingMessage((EmailMessage) item, _useConversationGuidOnly, true /* config is not available here maybe, so hardcoded to true temporary*/)); // And wrap them with EWSIncomingMessage
+                    .Select(item => new EWSIncomingMessage((EmailMessage) item, _useConversationGuidOnly, _convertInlineAttachments)); // And wrap them with EWSIncomingMessage
         }
     }
 }

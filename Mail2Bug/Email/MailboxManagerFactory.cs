@@ -28,7 +28,7 @@ namespace Mail2Bug.Email
                 Password = password
             };
 
-            var exchangeService = _connectionManger.GetConnection(credentials, emailSettings.UseConversationGuidOnly);
+            var exchangeService = _connectionManger.GetConnection(credentials, emailSettings.UseConversationGuidOnly, emailSettings.ConvertInlineAttachments);
             var postProcessor = GetPostProcesor(emailSettings, exchangeService.Service);
 
             switch (emailSettings.ServiceType)
@@ -38,7 +38,8 @@ namespace Mail2Bug.Email
                         exchangeService.Service, 
                         emailSettings.IncomingFolder,
                         postProcessor,
-                        emailSettings.UseConversationGuidOnly);
+                        emailSettings.UseConversationGuidOnly,
+                        emailSettings.ConvertInlineAttachments);
 
                 case Config.EmailSettings.MailboxServiceType.EWSByRecipients:
 

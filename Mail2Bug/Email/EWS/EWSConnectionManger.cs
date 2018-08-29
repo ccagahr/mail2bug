@@ -40,11 +40,11 @@ namespace Mail2Bug.Email.EWS
             }
         }
 
-        public EWSConnection GetConnection(Credentials credentials, bool useConversationGuidOnly)
+        public EWSConnection GetConnection(Credentials credentials, bool useConversationGuidOnly, bool convertInlineAttachments)
         {
             if (!_enableConnectionCaching)
             {
-                return ConnectToEWS(credentials, useConversationGuidOnly);
+                return ConnectToEWS(credentials, useConversationGuidOnly, convertInlineAttachments);
             }
 
             lock (_cachedConnections)
@@ -58,7 +58,7 @@ namespace Mail2Bug.Email.EWS
                 }
 
                 Logger.InfoFormat("Creating FolderMailboxManager for {0}", key);
-                _cachedConnections[key] = ConnectToEWS(credentials, useConversationGuidOnly);
+                _cachedConnections[key] = ConnectToEWS(credentials, useConversationGuidOnly, convertInlineAttachments);
                 return _cachedConnections[key];
             }
         }
@@ -79,7 +79,7 @@ namespace Mail2Bug.Email.EWS
                 credentials.UserName, credentials.Password.GetHashCode(), useConversationGuid);
         }
 
-        static private EWSConnection ConnectToEWS(Credentials credentials, bool useConversationGuidOnly)
+        static private EWSConnection ConnectToEWS(Credentials credentials, bool useConversationGuidOnly, bool convertInlineAttachments)
         {
             Logger.DebugFormat("Initializing FolderMailboxManager for email adderss {0}", credentials.EmailAddress);
             var exchangeService = new ExchangeService(ExchangeVersion.Exchange2010_SP1)
@@ -104,7 +104,7 @@ namespace Mail2Bug.Email.EWS
                 Service = exchangeService,
                 Router =
                     new RecipientsMailboxManagerRouter(
-                        new EWSMailFolder(Folder.Bind(exchangeService, WellKnownFolderName.Inbox), useConversationGuidOnly))
+                        new EWSMailFolder(Folder.Bind(exchangeService, WellKnownFolderName.Inbox), useConversationGuidOnly, convertInlineAttachments))
             };
         }
 
