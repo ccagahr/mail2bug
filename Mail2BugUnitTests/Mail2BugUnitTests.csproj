@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="DateBasedValueResolverUnitTest.cs" />
     <Compile Include="EmailBodyProcessingUtilsUnitTest.cs" />
+    <Compile Include="MailHeaderExtractorTest.cs" />
     <Compile Include="Mocks\Email\IncomingAttachmentMock.cs" />
     <Compile Include="Mocks\Email\IncomingEmailMessageMock.cs" />
     <Compile Include="Mocks\Email\MailManagerMock.cs" />

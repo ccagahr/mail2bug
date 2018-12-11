@@ -416,9 +416,9 @@ namespace Mail2Bug.WorkItemManagement
             if (workItemId <= 0) return;
 
             if (_config.WorkItemSettings.UseWholeEmailBodyInHistory)
-            {
+            {                
                 // just remember changes and apply them later in the AttachAndInlineFiles method
-                this.AddOutstandingModifyWorkItem(workItemId, message.HtmlBody, values);
+                this.AddOutstandingModifyWorkItem(workItemId, MailHeaderExtractor.GetHtmlBody(_config, message, message.HtmlBody), values);
                 return;
             }
 

@@ -113,6 +113,7 @@ namespace Mail2Bug
                 AttachOriginalMessage = true;
                 AttachUpdateMessages = false;
                 UseWholeEmailBodyInHistory = false;
+                AddEmailHeaderToMessageDescription = false;
             }
 
             public enum ProcessingStrategyType
@@ -133,6 +134,7 @@ namespace Mail2Bug
             public bool AttachOriginalMessage { get; set; }
             public bool AttachUpdateMessages { get; set; }
             public bool UseWholeEmailBodyInHistory { get; set; }
+            public bool AddEmailHeaderToMessageDescription { get; set; }
 
             public ProcessingStrategyType ProcessingStrategy = ProcessingStrategyType.SimpleBugStrategy;            
         }

@@ -113,9 +113,9 @@ namespace Mail2Bug.MessageProcessingStrategies
                 {
                     Logger.Warn($"Field {emailBodyFieldName} is defined for mapping in {nameof(_config.WorkItemSettings.EmailBodyFieldName)} for mapping. The DefaultValueDefinition entry will be ignored.");
                 }
-                workItemUpdates[emailBodyFieldName] = resolver.HtmlMessageBody;
+                workItemUpdates[emailBodyFieldName] = MailHeaderExtractor.GetHtmlBody(_config, message, resolver.HtmlMessageBody);
             }
-        }
+        }        
 
         private void TryApplyFieldOverrides(Dictionary<string, string> overrides, int workItemId)
         {

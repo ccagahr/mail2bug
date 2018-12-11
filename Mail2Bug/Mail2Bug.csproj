@@ -321,6 +321,7 @@
     <Compile Include="MessageProcessingStrategies\DateBasedValueResolver.cs" />
     <Compile Include="MessageProcessingStrategies\IMessageProcessingStrategy.cs" />
     <Compile Include="MessageProcessingStrategies\INameResolver.cs" />
+    <Compile Include="MessageProcessingStrategies\MailHeaderExtractor.cs" />
     <Compile Include="MessageProcessingStrategies\NameResolver.cs" />
     <Compile Include="MessageProcessingStrategies\NameResolverMock.cs" />
     <Compile Include="MessageProcessingStrategies\OverridesExtractor.cs" />
