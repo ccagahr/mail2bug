@@ -30,6 +30,7 @@ namespace Mail2Bug.MessageProcessingStrategies
                 header.Append(String.Format(pattern, "CC", string.Join(";", _emailMessage.CcAddresses)));
             }
             header.Append(String.Format(pattern, "Betreff", _emailMessage.Subject));
+            header.Append(String.Format(pattern, "Anlagen", "<div id=\"{8BA72636-CEA9-4DA6-A653-FD9227511CE1}\"></div>"));
             header.Append("<hr>");
 
             return header.ToString();

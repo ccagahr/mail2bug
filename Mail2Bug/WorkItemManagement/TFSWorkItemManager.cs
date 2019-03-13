@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Web;
 using log4net;
 using Mail2Bug.ExceptionClasses;
 using Mail2Bug.Helpers;
@@ -344,6 +345,21 @@ namespace Mail2Bug.WorkItemManagement
                     }
                     return match.Groups[0].ToString();
                 });
+
+                string attachmentList = null;
+                attachmentTrackers.ForEach(a => 
+                {
+                    if (a.IsInline == false)
+                    {                        
+                        attachmentList += String.Format("<br /><a href=\"{0}\" target=\"_blank\">{1}</a>", a.Attachment.Uri.ToString(), HttpUtility.HtmlEncode(a.Attachment.Name));
+                        Logger.InfoFormat("Attachment to store in mail body {0}: {1}", a.Attachment.Name, a.Attachment.Uri.ToString());                                                                        
+
+                    }
+                });
+                if (!String.IsNullOrEmpty(attachmentList))
+                {                    
+                    html = Regex.Replace(html, "<div id=\"{8BA72636-CEA9-4DA6-A653-FD9227511CE1}\"></div>", attachmentList);
+                }
 
                 workItem.Fields[fieldNameToUpdate].Value = html;
                 ValidateAndSaveWorkItem(workItem);
