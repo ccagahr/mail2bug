@@ -15,7 +15,7 @@ namespace Mail2BugUnitTests
             var message = getTestMail(true);
             string senderAddress = message.SenderAddress;
             
-            string expectedResult = "<b>Von</b>: " + senderAddress + "<br><b>Gesendet</b>: 11.12.2018 11:30:00<br><b>An</b>: to1@test.com;to2@test.com<br><b>CC</b>: cc1@test.com;cc2@test.com<br><b>Betreff</b>: E-Mailsubject<br><hr>";
+            string expectedResult = "<b>Von</b>: " + senderAddress + "<br><b>Gesendet</b>: 11.12.2018 11:30:00<br><b>An</b>: to1@test.com;to2@test.com<br><b>CC</b>: cc1@test.com;cc2@test.com<br><b>Betreff</b>: E-Mailsubject<br><b>Anlagen</b>: <div id=\"{8BA72636-CEA9-4DA6-A653-FD9227511CE1}\"></div><br><hr>";
 
             var extractor = new MailHeaderExtractor(message);
 
@@ -28,7 +28,7 @@ namespace Mail2BugUnitTests
             var message = getTestMail(false);
             string senderAddress = message.SenderAddress;
            
-            string expectedResult = "<b>Von</b>: " + senderAddress + "<br><b>Gesendet</b>: 11.12.2018 11:30:00<br><b>An</b>: to1@test.com;to2@test.com<br><b>Betreff</b>: E-Mailsubject<br><hr>";
+            string expectedResult = "<b>Von</b>: " + senderAddress + "<br><b>Gesendet</b>: 11.12.2018 11:30:00<br><b>An</b>: to1@test.com;to2@test.com<br><b>Betreff</b>: E-Mailsubject<br><b>Anlagen</b>: <div id=\"{8BA72636-CEA9-4DA6-A653-FD9227511CE1}\"></div><br><hr>";
 
             var extractor = new MailHeaderExtractor(message);
 
@@ -44,7 +44,7 @@ namespace Mail2BugUnitTests
             message.HtmlBody = "<html><head></head><body style=\"cool\">blabla</body></html>";
             string senderAddress = message.SenderAddress;
 
-            string expectedResult = "<html><head></head><body style=\"cool\"><b>Von</b>: " + senderAddress + "<br><b>Gesendet</b>: 11.12.2018 11:30:00<br><b>An</b>: to1@test.com;to2@test.com<br><b>Betreff</b>: E-Mailsubject<br><hr>blabla</body></html>";
+            string expectedResult = "<html><head></head><body style=\"cool\"><b>Von</b>: " + senderAddress + "<br><b>Gesendet</b>: 11.12.2018 11:30:00<br><b>An</b>: to1@test.com;to2@test.com<br><b>Betreff</b>: E-Mailsubject<br><b>Anlagen</b>: <div id=\"{8BA72636-CEA9-4DA6-A653-FD9227511CE1}\"></div><br><hr>blabla</body></html>";
             
             Assert.AreEqual(expectedResult, MailHeaderExtractor.GetHtmlBody(config, message, message.HtmlBody), true, "Validate the right headers embbeded in the body");
         }

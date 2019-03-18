@@ -17,6 +17,11 @@ namespace Mail2Bug.MessageProcessingStrategies
             _emailMessage = emailMessage;
         }
 
+        /// <summary>
+        /// Returns a string with the mail information (SenderAddress, SentOn, ToAddresses, CcAddresses, Subject, A placeholder for attachment names) in html form, to embedd it in workitems (description/history).
+        /// </summary>
+        /// <returns>A html formatted string containing the important mail properties.</returns>
+        /// <remarks>The method is public to make it testable for unit tests.</remarks>
         public string GetHeaderHtml()
         {
             const string pattern = "<b>{0}</b>: {1}<br>";
